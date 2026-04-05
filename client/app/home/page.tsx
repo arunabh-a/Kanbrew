@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, LayoutGrid, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 const features = [
     {
@@ -22,7 +23,7 @@ const features = [
 
 export default function Page() {
     return (
-        <div className="min-h-screen bg-background overflow-hidden">
+        <div className="min-h-screen flex-1 bg-background overflow-hidden">
             {/* Ambient background */}
             <div className="fixed inset-0 pointer-events-none">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
@@ -30,7 +31,7 @@ export default function Page() {
             </div>
 
             {/* Header */}
-            <header className="relative z-10 container flex items-center justify-between h-16 px-4 md:px-6">
+            <header className="relative z-10 flex items-center justify-between h-16 px-4 md:px-6 ">
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shadow-md">
                         <svg
@@ -55,14 +56,29 @@ export default function Page() {
                     <Button asChild>
                         <Link href="/sign-up">Get started</Link>
                     </Button>
+                    <div className="flex items-center gap-2 p-2 border backdrop-blur-sm hover:bg-muted transition-colors rounded-xl">
+                        <Link
+                            href="https://github.com/arunabh-a/Task-Brew"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <Image
+                                src="/github.svg"
+                                alt="GitHub"
+                                width={24}
+                                height={24}
+                            />
+                        </Link>
+                        <h1>Repo</h1>
+                    </div>
                 </div>
             </header>
 
             {/* Hero */}
-            <main className="relative z-10 container px-4 md:px-6">
+            <main className="relative z-10 w-full px-4 md:px-6">
                 <div className="flex flex-col items-center text-center pt-20 md:pt-32 pb-20">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-sm text-muted-foreground mb-6 animate-fade-up">
-                        <span className="w-2 h-2 rounded-full bg-status-done animate-pulse" />
+                        <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                         Now with Kanban boards
                     </div>
 
