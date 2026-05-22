@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { Task, Priority, Status } from "@/service/app.interface";
+import { Task, Priority, TaskStatus } from "@/service/app.interface";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,8 +30,8 @@ import { cn } from "@/lib/utils";
 interface TaskDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (task: Omit<Task, "id" | "createdAt" | "updatedAt">) => void;
-  defaultStatus?: Status;
+  onSubmit: (task: Omit<Task, "id" | "userId" | "createdAt" | "updatedAt">) => Promise<{ success: boolean; message?: string }> | void;
+  defaultStatus?: TaskStatus;
 }
 
 export function TaskDialog({
@@ -44,7 +44,7 @@ export function TaskDialog({
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState<Date | undefined>();
   const [priority, setPriority] = useState<Priority>("MEDIUM");
-  const [status, setStatus] = useState<Status>(defaultStatus);
+  const [status, setStatus] = useState<TaskStatus>(defaultStatus);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,26 +52,26 @@ export function TaskDialog({
     if (!title.trim()) return;
 
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    onSubmit({
-      title: title.trim(),
-      description: description.trim() || undefined,
-      dueDate: dueDate ? format(dueDate, "yyyy-MM-dd") : undefined,
-      priority,
-      status,
-    });
-
-    // Reset form
-    setTitle("");
-    setDescription("");
-    setDueDate(undefined);
-    setPriority("MEDIUM");
-    setStatus(defaultStatus);
-    setIsSubmitting(false);
-    onOpenChange(false);
+    try {
+      await onSubmit({
+        title: title.trim(),
+        description: description.trim() || null,
+        dueDate: dueDate ? format(dueDate, "yyyy-MM-dd") : null,
+        priority,
+        status,
+        assigneeId: null,
+        projectId: null,
+      });
+    } finally {
+      // Reset form
+      setTitle("");
+      setDescription("");
+      setDueDate(undefined);
+      setPriority("MEDIUM");
+      setStatus(defaultStatus);
+      setIsSubmitting(false);
+      onOpenChange(false);
+    }
   };
 
   return (
@@ -122,7 +122,7 @@ export function TaskDialog({
 
             <div className="space-y-2">
               <Label>Status</Label>
-              <Select value={status} onValueChange={(v) => setStatus(v as Status)}>
+              <Select value={status} onValueChange={(v) => setStatus(v as TaskStatus)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

@@ -9,7 +9,7 @@ import {
     Pencil,
     Trash2,
 } from "lucide-react";
-import { Task, Priority, Status } from "@/service/app.interface";
+import { Task, Priority, TaskStatus } from "@/service/app.interface";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -44,7 +44,7 @@ const priorityLabels: Record<Priority, string> = {
     HIGH: "High",
 };
 
-const statusLabels: Record<Status, string> = {
+const statusLabels: Record<TaskStatus, string> = {
     TODO: "To Do",
     IN_PROGRESS: "In Progress",
     DONE: "Done",
@@ -82,7 +82,7 @@ export function TaskCard({
         if (editedTitle.trim()) {
             onUpdate(task.id, {
                 title: editedTitle.trim(),
-                description: editedDescription.trim() || undefined,
+                description: editedDescription.trim() || null,
             });
         }
         setIsEditing(false);
@@ -104,7 +104,7 @@ export function TaskCard({
         onUpdate(task.id, { priority });
     };
 
-    const handleStatusChange = (status: Status) => {
+    const handleStatusChange = (status: TaskStatus) => {
         onUpdate(task.id, { status });
     };
 

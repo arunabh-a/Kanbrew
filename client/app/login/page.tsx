@@ -16,12 +16,7 @@ export default function Login() {
     }, [isAuthenticated, router]);
 
     const handleLogin = async (email: string, password: string) => {
-        const result = await login(email, password);
-        const success = typeof result === 'boolean' ? result : result.success;
-        if (success) {
-            router.push("/");
-        }
-        return success;
+        return await login(email, password);
     };
 
     // const handleGoogleLogin = async () => {

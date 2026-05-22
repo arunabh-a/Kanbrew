@@ -1,31 +1,9 @@
-import { Task, Priority, Status, User } from "./app.interface";
+import { Task, Priority, TaskStatus, User, Project, ProjectMember, DashboardSummary, MemberRole } from "./app.interface";
 import { authFetch, handleAutoLogout } from "@/lib/interceptor";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-// Helper function for API calls using authFetch interceptor
-async function apiCall<T>(
-    endpoint: string,
-    options: RequestInit = {}
-): Promise<T> {
-    try {
-        const response = await authFetch(endpoint, options);
 
-        if (!response.ok) {
-            const error = await response
-                .json()
-                .catch(() => ({ message: "An error occurred" }));
-            throw new Error(
-                error.message || `HTTP error! status: ${response.status}`
-            );
-        }
-
-        return response.json();
-    } catch (error: any) {
-        console.error(`API call failed for ${endpoint}:`, error);
-        throw error;
-    }
-}
 
 // ============================================
 // Authentication Routes
@@ -39,106 +17,79 @@ export const authApi = {
         email: string;
         password: string;
         name?: string;
-    }): Promise<{ message: string; userId: string }> => {
-        return apiCall("/auth/register", {
+    }): Promise<{
+        message: string;
+        user: { id: string; email: string; name: string | null; emailVerified: boolean };
+    }> => {
+        return authFetch("/auth/register", {
             method: "POST",
             body: JSON.stringify(data),
         });
     },
 
     /**
-     * Verify user email
+     * Verify user email — server expects GET /auth/verify?token=...
      */
-    verifyEmail: async (token: string): Promise<{ message: string }> => {
-        return apiCall("/auth/verify-email", {
-            method: "POST",
-            body: JSON.stringify({ token }),
+    verifyEmail: async (token: string): Promise<{ message: string; success: boolean }> => {
+        return authFetch(`/auth/verify?token=${encodeURIComponent(token)}`, {
+            method: "GET",
+            headers: { Accept: "application/json" },
         });
     },
 
     /**
-     * Login user
+     * Login user.
+     * The server sets httpOnly cookies (accessToken, refreshToken) directly —
+     * we must NOT write them from JS. We just return the response body.
      */
     login: async (data: {
         email: string;
         password: string;
     }): Promise<{
         accessToken: string;
-        refreshToken: string;
         user: User;
     }> => {
-        const response = await apiCall<{
-            accessToken: string;
-            refreshToken: string;
-            user: User;
-        }>("/auth/login", {
+        return authFetch("/auth/login", {
             method: "POST",
+            credentials: "include", // send/receive httpOnly cookies
             body: JSON.stringify(data),
         });
-
-        // Store tokens in cookies (more secure than localStorage)
-        document.cookie = `access_token=${response.accessToken}; path=/; secure; samesite=strict; max-age=${15 * 60}`; // 15 minutes
-        document.cookie = `refresh_token=${response.refreshToken}; path=/; secure; samesite=strict; max-age=${7 * 24 * 60 * 60}`; // 7 days
-        document.cookie = `token_type=Bearer; path=/; secure; samesite=strict`;
-
-        return response;
     },
 
     /**
-     * Refresh access token
+     * Refresh access token.
+     * The server reads the refreshToken from its httpOnly cookie — no body needed.
+     * New httpOnly cookies are set by the server in the response.
      */
-    refreshToken: async (
-        refreshToken: string
-    ): Promise<{
-        accessToken: string;
-    }> => {
+    refreshToken: async (): Promise<{ accessToken: string }> => {
         const response = await fetch(`${baseUrl}/auth/refresh`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ refreshToken }),
+            credentials: "include", // send httpOnly refreshToken cookie
+            headers: { "Content-Type": "application/json" },
         });
 
         if (!response.ok) {
             throw new Error("Failed to refresh token");
         }
 
-        const data = await response.json();
-
-        // Update access token in cookie
-        document.cookie = `access_token=${data.accessToken}; path=/; secure; samesite=strict; max-age=${15 * 60}`;
-
-        return data;
+        return response.json();
     },
 
     /**
-     * Logout user
+     * Logout user.
+     * The server reads the refreshToken from its httpOnly cookie and revokes it.
+     * The server also clears the httpOnly cookies in the response.
      */
     logout: async (): Promise<{ message: string }> => {
-        const refreshToken = document.cookie
-            .split("; ")
-            .find((row) => row.startsWith("refresh_token="))
-            ?.split("=")[1];
-
-        if (refreshToken) {
-            try {
-                const response = await apiCall<{ message: string }>("/auth/logout", {
-                    method: "POST",
-                    body: JSON.stringify({ refreshToken }),
-                });
-                return response;
-            } catch (error) {
-                console.error("Logout API call failed:", error);
-            }
+        try {
+            return await authFetch("/auth/logout", {
+                method: "POST",
+                credentials: "include", // send httpOnly cookies so server can revoke
+            });
+        } catch (error) {
+            console.error("Logout API call failed:", error);
+            return { message: "Logged out" };
         }
-
-        // Clear cookies regardless of API response
-        document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
-        document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
-        document.cookie = "token_type=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
-
-        return { message: "Logged out successfully" };
     },
 };
 
@@ -151,7 +102,7 @@ export const userApi = {
      * Get current user profile
      */
     getProfile: async (): Promise<User> => {
-        return apiCall("/users/me", {
+        return authFetch("/users/me", {
             method: "GET",
         });
     },
@@ -162,41 +113,11 @@ export const userApi = {
     updateProfile: async (data: {
         name?: string;
         bio?: string;
-        avatarUrl?: string;
     }): Promise<User> => {
-        return apiCall("/users/me", {
+        return authFetch("/users/me", {
             method: "PUT",
             body: JSON.stringify(data),
         });
-    },
-
-    /**
-     * Change user password
-     */
-    changePassword: async (data: {
-        currentPassword: string;
-        newPassword: string;
-    }): Promise<{ message: string }> => {
-        return apiCall("/users/me/password", {
-            method: "PUT",
-            body: JSON.stringify(data),
-        });
-    },
-
-    /**
-     * Delete user account
-     */
-    deleteAccount: async (): Promise<{ message: string }> => {
-        const response = await apiCall<{ message: string }>("/users/me", {
-            method: "DELETE",
-        });
-
-        // Clear cookies
-        document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
-        document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
-        document.cookie = "token_type=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
-
-        return response;
     },
 };
 
@@ -209,7 +130,7 @@ export const taskApi = {
      * Get all tasks with optional filters
      */
     getTasks: async (filters?: {
-        status?: Status;
+        status?: TaskStatus;
         priority?: Priority;
         search?: string;
     }): Promise<Task[]> => {
@@ -220,9 +141,9 @@ export const taskApi = {
         if (filters?.search) params.append("search", filters.search);
 
         const queryString = params.toString();
-        const endpoint = queryString ? `/tasks/tasks?${queryString}` : "/tasks/tasks";
+        const endpoint = queryString ? `/tasks?${queryString}` : "/tasks";
 
-        return apiCall(endpoint, {
+        return authFetch(endpoint, {
             method: "GET",
         });
     },
@@ -235,9 +156,9 @@ export const taskApi = {
         description?: string;
         dueDate?: string;
         priority?: Priority;
-        status?: Status;
+        status?: TaskStatus;
     }): Promise<Task> => {
-        return apiCall("/tasks/tasks", {
+        return authFetch("/tasks", {
             method: "POST",
             body: JSON.stringify(data),
         });
@@ -253,10 +174,10 @@ export const taskApi = {
             description?: string;
             dueDate?: string;
             priority?: Priority;
-            status?: Status;
+            status?: TaskStatus;
         }
     ): Promise<Task> => {
-        return apiCall(`/tasks/tasks/${taskId}`, {
+        return authFetch(`/tasks/${taskId}`, {
             method: "PUT",
             body: JSON.stringify(data),
         });
@@ -266,10 +187,76 @@ export const taskApi = {
      * Delete a task
      */
     deleteTask: async (taskId: string): Promise<{ message: string }> => {
-        return apiCall(`/tasks/tasks/${taskId}`, {
+        return authFetch(`/tasks/${taskId}`, {
             method: "DELETE",
         });
     },
+};
+
+// ============================================
+// Project Routes
+// ============================================
+
+export const projectApi = {
+    /** List all projects the current user is a member of */
+    getProjects: (): Promise<Project[]> =>
+        authFetch("/projects", { method: "GET" }),
+
+    /** Create a new project */
+    createProject: (data: { name: string; description?: string }): Promise<Project> =>
+        authFetch("/projects", { method: "POST", body: JSON.stringify(data) }),
+
+    /** Get single project details */
+    getProject: (projectId: string): Promise<Project> =>
+        authFetch(`/projects/${projectId}`, { method: "GET" }),
+
+    /** Update project name or description */
+    updateProject: (projectId: string, data: { name: string; description?: string }): Promise<Project> =>
+        authFetch(`/projects/${projectId}`, { method: "PUT", body: JSON.stringify(data) }),
+
+    /** Delete a project */
+    deleteProject: (projectId: string): Promise<{ message: string }> =>
+        authFetch(`/projects/${projectId}`, { method: "DELETE" }),
+
+    /** List all members of a project */
+    getMembers: (projectId: string): Promise<ProjectMember[]> =>
+        authFetch(`/projects/${projectId}/members`, { method: "GET" }),
+
+    /** Add a user by email to a project */
+    addMember: (projectId: string, email: string, role: MemberRole = "MEMBER"): Promise<ProjectMember> =>
+        authFetch(`/projects/${projectId}/members`, {
+            method: "POST",
+            body: JSON.stringify({ email, role }),
+        }),
+
+    /** Change a member's role */
+    updateMemberRole: (projectId: string, userId: string, role: MemberRole): Promise<ProjectMember> =>
+        authFetch(`/projects/${projectId}/members/${userId}`, {
+            method: "PUT",
+            body: JSON.stringify({ role }),
+        }),
+
+    /** Remove a member from a project */
+    removeMember: (projectId: string, userId: string): Promise<{ message: string }> =>
+        authFetch(`/projects/${projectId}/members/${userId}`, { method: "DELETE" }),
+};
+
+// ============================================
+// Dashboard Routes
+// ============================================
+
+export const dashboardApi = {
+    /** Get task counts grouped by status + overdue count */
+    getSummary: (): Promise<DashboardSummary> =>
+        authFetch("/dashboard/summary", { method: "GET" }),
+
+    /** Get tasks assigned to the current user */
+    getAssigned: (): Promise<Task[]> =>
+        authFetch("/dashboard/assigned", { method: "GET" }),
+
+    /** Get all overdue tasks for the current user */
+    getOverdue: (): Promise<Task[]> =>
+        authFetch("/dashboard/overdue", { method: "GET" }),
 };
 
 // ============================================
@@ -280,6 +267,8 @@ export const apiRoutes = {
     auth: authApi,
     user: userApi,
     task: taskApi,
+    project: projectApi,
+    dashboard: dashboardApi,
 };
 
 // ============================================
@@ -287,42 +276,20 @@ export const apiRoutes = {
 // ============================================
 
 /**
- * Check if user is authenticated by checking for access token in cookies
+ * Check if a session likely exists by attempting to reach the profile endpoint.
+ * Since auth is fully cookie-based (httpOnly), we cannot read tokens from JS.
+ * Use useAuth().isAuthenticated (derived from whether user state is populated) instead.
+ * @deprecated Use the isAuthenticated value from useAuth() hook.
  */
 export const isAuthenticated = (): boolean => {
-    const accessToken = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("access_token="))
-        ?.split("=")[1];
-    return !!accessToken;
+    // Cannot inspect httpOnly cookies from JS.
+    // Return true optimistically — authFetch will trigger a refresh or logout if the session is gone.
+    // The real source of truth is the User object in useAuth().
+    return true;
 };
 
 /**
- * Get stored access token from cookies
- */
-export const getAccessToken = (): string | null => {
-    return (
-        document.cookie
-            .split("; ")
-            .find((row) => row.startsWith("access_token="))
-            ?.split("=")[1] || null
-    );
-};
-
-/**
- * Get stored refresh token from cookies
- */
-export const getRefreshToken = (): string | null => {
-    return (
-        document.cookie
-            .split("; ")
-            .find((row) => row.startsWith("refresh_token="))
-            ?.split("=")[1] || null
-    );
-};
-
-/**
- * Manual logout helper (clears cookies and redirects)
+ * Manual logout helper (clears cookies server-side and redirects)
  */
 export const manualLogout = () => {
     handleAutoLogout('Manual logout');

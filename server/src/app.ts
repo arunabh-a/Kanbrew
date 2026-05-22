@@ -8,11 +8,16 @@ dotenv.config();
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import taskRoutes from './routes/tasks.js';
+import projectRoutes from './routes/projects.js';
+import dashboardRoutes from './routes/dashboard.js';
 import cookieParser from 'cookie-parser'; 
 import { errorHandler } from './middleware/errorHandler.js';
 
 export const app = express();
-app.use(cors({ origin: process.env.CORS_CLIENT_URL, credentials: true }));
+app.use(cors({
+    origin: (process.env.CORS_CLIENT_URL || 'http://localhost:3000').split(',').map(o => o.trim()),
+    credentials: true,
+}));
 app.use(express.json());
 app.use(cookieParser()); // used to parse cookies from the request headers
 
@@ -29,5 +34,7 @@ app.get('/health', (_req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.use(errorHandler);

@@ -4,18 +4,26 @@ import { prisma } from "../lib/prisma.js";
 
 const router = Router();
 
-// GET /user - Get user by query id
+// GET /user - Get user by query id (restricted to own profile)
 router.get('/user', requireAuth, async (req, res) => {
     try {
+        const { user } = req as any;
         const userId = req.query.userId as string;
         if (!userId) {
             return res.status(400).json({ message: "userId query parameter is required" });
         }
-        const user = await prisma.user.findUnique({
+        // Prevent IDOR: users may only fetch their own record via this endpoint
+        if (userId !== user.userId) {
+            return res.status(403).json({ message: "Forbidden: you may only access your own profile" });
+        }
+        const foundUser = await prisma.user.findUnique({
             where: { id: userId },
-            select: { id: true, email: true, name: true, bio: true, createdAt: true, updatedAt: true, emailVerified: true }
+            // select: { id: true, email: true, name: true, bio: true, createdAt: true, updatedAt: true, emailVerified: true }
         });
-        return res.status(200).json(user);
+        if (!foundUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        return res.status(200).json(foundUser);
     } catch (error) {
         console.error("Error fetching user:", error);
         return res.status(500).json({ message: "Internal server error" });
@@ -52,10 +60,21 @@ router.put('/me', requireAuth, async (req, res) => {
     try {
         const { user } = req as any;
         const { name, bio } = req.body;
+
+        // Basic input validation
+        if (name !== undefined && (typeof name !== 'string' || name.trim().length === 0 || name.length > 100)) {
+            return res.status(400).json({ message: "Name must be a non-empty string of at most 100 characters" });
+        }
+        if (bio !== undefined && (typeof bio !== 'string' || bio.length > 500)) {
+            return res.status(400).json({ message: "Bio must be a string of at most 500 characters" });
+        }
         
         const updatedUser = await prisma.user.update({
             where: { id: user.userId },
-            data: { name, bio },
+            data: { 
+                name: name !== undefined ? name.trim() : undefined, 
+                bio: bio !== undefined ? bio : undefined 
+            },
             select: { 
                 id: true, 
                 email: true, 

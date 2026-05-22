@@ -19,18 +19,20 @@ export default function Signup() {
         name: string,
         email: string,
         password: string
-    ): Promise<boolean> => {
+    ): Promise<{ success: boolean; message?: string }> => {
         const result = await register(name, email, password);
         if (result.success) {
-            router.push("/");
+            // User needs to verify their email before they can log in —
+            // redirect to a confirmation page, NOT the dashboard.
+            router.push(`/verify-email-sent?email=${encodeURIComponent(email)}`);
         }
-        return result.success;
+        return result;
     };
 
     return (
         <AuthLayout
             title="Create an account"
-            subtitle="Get started with Taskbrew today"
+            subtitle="Get started with Kanbrew today"
         >
             <SignupForm
                 onSubmit={handleSignup}

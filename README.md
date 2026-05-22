@@ -1,6 +1,8 @@
-# 🍺 Task-Brew
-
-A modern, full-stack task management application with drag-and-drop Kanban boards, built with Next.js, Express, and Prisma.
+<div align="center">
+  <img alt="Kanbrew Logo" src="client/public/kanbrew.png" width="120" />
+  <h1>Kanbrew (previously TaskBrew)</h1>
+  <p>A modern, full-stack task management application with drag-and-drop Kanban boards,<br/>built with Next.js, Express, and Prisma.</p>
+</div>
 
 ## ✨ Features
 
@@ -106,7 +108,7 @@ Task-Brew/
    
    Create a `.env` file in the `server` directory:
    ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/taskbrew"
+   DATABASE_URL="postgresql://user:password@localhost:5432/kanbrew"
    JWT_SECRET="your-jwt-secret"
    JWT_REFRESH_SECRET="your-refresh-secret"
    CORS_CLIENT_URL="http://localhost:3000"
@@ -116,7 +118,7 @@ Task-Brew/
    EMAIL_PORT=587
    EMAIL_USER="your-email@example.com"
    EMAIL_PASSWORD="your-password"
-   EMAIL_FROM="Task-Brew <noreply@taskbrew.com>"
+   EMAIL_FROM="Task-Brew <noreply@kanbrew.com>"
    ```
 
 4. **Run database migrations**
@@ -178,7 +180,7 @@ Task-Brew/
 - `DELETE /api/tasks/:id` - Delete a task
 
 For detailed API documentation, import the Postman collection available at:
-`server/TaskBrew-API.postman_collection.json`
+`server/kanbrew-API.postman_collection.json`
 
 ## 🗄️ Database Schema
 
@@ -283,7 +285,7 @@ sudo npm install -g pm2
 
 #### 2. Configure Nginx Reverse Proxy
 
-Create Nginx configuration at `/etc/nginx/sites-available/taskbrew`:
+Create Nginx configuration at `/etc/nginx/sites-available/kanbrew`:
 
 ```nginx
 server {
@@ -317,14 +319,14 @@ server {
 
 Enable the site:
 ```bash
-sudo ln -s /etc/nginx/sites-available/taskbrew /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/kanbrew /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl restart nginx
 ```
 
 #### 3. Setup systemd Services
 
-**Backend Service** (`/etc/systemd/system/taskbrew-backend.service`):
+**Backend Service** (`/etc/systemd/system/kanbrew-backend.service`):
 
 ```ini
 [Unit]
@@ -344,7 +346,7 @@ RestartSec=10
 WantedBy=multi-user.target
 ```
 
-**Frontend Service** (`/etc/systemd/system/taskbrew-frontend.service`):
+**Frontend Service** (`/etc/systemd/system/kanbrew-frontend.service`):
 
 ```ini
 [Unit]
@@ -367,10 +369,10 @@ WantedBy=multi-user.target
 **Enable and start services:**
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable taskbrew-backend
-sudo systemctl enable taskbrew-frontend
-sudo systemctl start taskbrew-backend
-sudo systemctl start taskbrew-frontend
+sudo systemctl enable kanbrew-backend
+sudo systemctl enable kanbrew-frontend
+sudo systemctl start kanbrew-backend
+sudo systemctl start kanbrew-frontend
 ```
 
 #### 4. Deploy Application
@@ -403,20 +405,20 @@ sudo certbot --nginx -d your-domain.com
 
 ```bash
 # Check service status
-sudo systemctl status taskbrew-backend
-sudo systemctl status taskbrew-frontend
+sudo systemctl status kanbrew-backend
+sudo systemctl status kanbrew-frontend
 
 # View logs
-sudo journalctl -u taskbrew-backend -f
-sudo journalctl -u taskbrew-frontend -f
+sudo journalctl -u kanbrew-backend -f
+sudo journalctl -u kanbrew-frontend -f
 
 # Restart services
-sudo systemctl restart taskbrew-backend
-sudo systemctl restart taskbrew-frontend
+sudo systemctl restart kanbrew-backend
+sudo systemctl restart kanbrew-frontend
 
 # Stop services
-sudo systemctl stop taskbrew-backend
-sudo systemctl stop taskbrew-frontend
+sudo systemctl stop kanbrew-backend
+sudo systemctl stop kanbrew-frontend
 ```
 
 ### Environment Variables (Production)
@@ -426,7 +428,7 @@ Ensure your production `.env` files are properly configured:
 **Server `.env`:**
 ```env
 NODE_ENV=production
-DATABASE_URL="postgresql://user:password@localhost:5432/taskbrew"
+DATABASE_URL="postgresql://user:password@localhost:5432/kanbrew"
 JWT_SECRET="your-production-jwt-secret"
 JWT_REFRESH_SECRET="your-production-refresh-secret"
 CORS_CLIENT_URL="https://your-domain.com"
@@ -436,8 +438,6 @@ CORS_CLIENT_URL="https://your-domain.com"
 ```env
 NEXT_PUBLIC_API_URL="https://your-domain.com/api"
 ```
-
-## 🤝 Contributing
 
 
 ## 🐛 Issues

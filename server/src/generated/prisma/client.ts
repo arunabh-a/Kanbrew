@@ -54,3 +54,13 @@ export type RefreshToken = Prisma.RefreshTokenModel
  * 
  */
 export type Task = Prisma.TaskModel
+/**
+ * Model Project
+ * 
+ */
+export type Project = Prisma.ProjectModel
+/**
+ * Model ProjectMember
+ * 
+ */
+export type ProjectMember = Prisma.ProjectMemberModel

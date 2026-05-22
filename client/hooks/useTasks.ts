@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { Task, Status, Priority } from "@/service/app.interface";
+import { Task, TaskStatus, Priority } from "@/service/app.interface";
 import { apiRoutes } from "@/service/app.api";
 
 export function useTasks() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState<Status | "ALL">("ALL");
+    const [statusFilter, setStatusFilter] = useState<TaskStatus | "ALL">("ALL");
 
     // Load tasks on mount
     useEffect(() => {
@@ -30,7 +30,7 @@ export function useTasks() {
         const matchesSearch =
             searchQuery === "" ||
             task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            task.description?.toLowerCase().includes(searchQuery.toLowerCase());
+            (task.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
 
         const matchesStatus =
             statusFilter === "ALL" || task.status === statusFilter;
@@ -44,8 +44,8 @@ export function useTasks() {
         try {
             const newTask = await apiRoutes.task.createTask({
                 title: taskData.title,
-                description: taskData.description,
-                dueDate: taskData.dueDate,
+                description: taskData.description ?? null,
+                dueDate: taskData.dueDate ?? null,
                 priority: taskData.priority,
                 status: taskData.status,
             });
@@ -89,11 +89,11 @@ export function useTasks() {
         }
     };
 
-    const moveTask = async (taskId: string, newStatus: Status) => {
+    const moveTask = async (taskId: string, newStatus: TaskStatus) => {
         return updateTask(taskId, { status: newStatus });
     };
 
-    const getTasksByStatus = (status: Status) => {
+    const getTasksByStatus = (status: TaskStatus) => {
         return filteredTasks.filter((task) => task.status === status);
     };
 

@@ -6,34 +6,39 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface LoginFormProps {
-    onSubmit: (email: string, password: string) => Promise<boolean>;
-    // onGoogleLogin: () => Promise<boolean>;
-    // isLoading: boolean;
-    // error: string | null;
+    onSubmit: (email: string, password: string) => Promise<{ success: boolean; message?: string } | boolean>;
 }
 
-export function LoginForm({
-    onSubmit,
-    // onGoogleLogin,
-    // isLoading,
-    // error,
-}: LoginFormProps) {
+export function LoginForm({ onSubmit }: LoginFormProps) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await onSubmit(email, password);
+        setError(null);
+        setIsLoading(true);
+        try {
+            const result = await onSubmit(email, password);
+            const success = typeof result === 'boolean' ? result : result.success;
+            if (!success) {
+                const msg = typeof result === 'object' ? result.message : undefined;
+                setError(msg || 'Invalid email or password');
+            }
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-5">
-            {/* {error && (
+            {error && (
                 <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm animate-in">
                     {error}
                 </div>
-            )} */}
+            )}
 
             <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -83,8 +88,8 @@ export function LoginForm({
                 </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={false}>
-                {false ? (
+            <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
                     <>
                         <Loader2 className="w-4 h-4 animate-spin" />
                         Signing in...

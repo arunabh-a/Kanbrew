@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "TaskBrew-API",
-    "description": "Authentication and user management API for TaskBrew Task Management Application",
+    "name": "Kanbrew-API",
+    "description": "Authentication and user management API for Kanbrew Task Management Application",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [

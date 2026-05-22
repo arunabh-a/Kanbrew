@@ -23,12 +23,13 @@ export function ProfileDialog({
     open,
     onOpenChange,
 }: ProfileDialogProps) {
-    const initials = user.name
+    const initials = (user.name ?? "")
         .split(" ")
+        .filter(Boolean)
         .map((n) => n[0])
         .join("")
         .toUpperCase()
-        .slice(0, 2);
+        .slice(0, 2) || "??";
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -93,7 +94,9 @@ export function ProfileDialog({
                             Member Since
                         </Label>
                         <Input
-                            value="December 2024"
+                            value={user.createdAt
+                                ? new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+                                : "—"}
                             readOnly
                             className="bg-muted/50"
                         />

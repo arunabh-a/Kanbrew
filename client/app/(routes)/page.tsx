@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Status } from "@/service/app.interface";
+import { TaskStatus, DashboardSummary } from "@/service/app.interface";
 import { useTasks } from "@/hooks/useTasks";
 import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/layout/Header";
@@ -9,10 +9,14 @@ import { TaskToolbar } from "@/components/layout/Toolbar";
 import { TaskListView } from "@/components/tasks/TaskList";
 import { KanbanBoard } from "@/components/tasks/KanbanBoard";
 import { TaskDialog } from "@/components/tasks/TaskDialog";
+import { apiRoutes } from "@/service/app.api";
+import { CheckSquare, Clock, AlertCircle, Circle } from "lucide-react";
 
 export default function Dashboard() {
     const router = useRouter();
-    const { user, loading: authLoading, logout } = useAuth();
+    const { loading: authLoading, logout } = useAuth();
+    const { user } = useAuth();
+
     const {
         tasks,
         loading: tasksLoading,
@@ -29,20 +33,28 @@ export default function Dashboard() {
 
     const [view, setView] = useState<"list" | "kanban">("kanban");
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-    const [defaultStatus, setDefaultStatus] = useState<Status>("TODO");
+    const [defaultStatus, setDefaultStatus] = useState<TaskStatus>("TODO");
+    const [summary, setSummary] = useState<DashboardSummary | null>(null);
 
     useEffect(() => {
-        // Redirect to login if not authenticated
         if (!authLoading && !user) {
             router.push("/home");
         }
     }, [user, authLoading, router]);
 
+    useEffect(() => {
+        if (user) {
+            apiRoutes.dashboard.getSummary()
+                .then(setSummary)
+                .catch(() => {/* non-critical, fail silently */});
+        }
+    }, [user]);
+
     const handleLogout = async () => {
         await logout();
     };
 
-    const handleCreateTask = (status?: Status) => {
+    const handleCreateTask = (status?: TaskStatus) => {
         if (status) {
             setDefaultStatus(status);
         } else {
@@ -51,7 +63,6 @@ export default function Dashboard() {
         setIsCreateDialogOpen(true);
     };
 
-    // Show loading state while checking authentication
     if (authLoading) {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
@@ -63,14 +74,43 @@ export default function Dashboard() {
         );
     }
 
-    // Don't render if not authenticated
     if (!user) {
         return null;
     }
 
+    const statCards = [
+        {
+            label: "To Do",
+            value: summary?.summary.TODO ?? "—",
+            icon: Circle,
+            color: "text-muted-foreground",
+            bg: "bg-muted/40",
+        },
+        {
+            label: "In Progress",
+            value: summary?.summary.IN_PROGRESS ?? "—",
+            icon: Clock,
+            color: "text-amber-500",
+            bg: "bg-amber-500/10",
+        },
+        {
+            label: "Done",
+            value: summary?.summary.DONE ?? "—",
+            icon: CheckSquare,
+            color: "text-green-500",
+            bg: "bg-green-500/10",
+        },
+        {
+            label: "Overdue",
+            value: summary?.overdue ?? "—",
+            icon: AlertCircle,
+            color: "text-red-500",
+            bg: "bg-red-500/10",
+        },
+    ];
+
     return (
-        <div className="min-h-screen bg-backgrond flex flex-col items-center">
-            <Header user={user} onLogout={handleLogout} />
+        <div className="min-h-screen w-full bg-backgrond flex flex-col items-center">
 
             <main className="container px-4 md:px-6 py-8">
                 <div className="mb-8">
@@ -82,13 +122,31 @@ export default function Dashboard() {
                     </p>
                 </div>
 
+                {/* Dashboard Stats */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                    {statCards.map((stat) => (
+                        <div
+                            key={stat.label}
+                            className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border"
+                        >
+                            <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center shrink-0`}>
+                                <stat.icon className={`w-4 h-4 ${stat.color}`} />
+                            </div>
+                            <div>
+                                <p className="text-xl font-bold leading-none">{stat.value}</p>
+                                <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
                 <TaskToolbar
                     view={view}
                     onViewChange={setView}
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
-                    statusFilter={statusFilter.toLowerCase() as Status | "all"}
-                    onStatusFilterChange={(status) => setStatusFilter(status === "all" ? "ALL" : status)}
+                    statusFilter={statusFilter}
+                    onStatusFilterChange={setStatusFilter}
                     onCreateTask={() => handleCreateTask()}
                 />
 

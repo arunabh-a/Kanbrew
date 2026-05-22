@@ -18,7 +18,44 @@ router.post("/register", async (req, res) => {
 
         const existing = await prisma.user.findUnique({ where: { email } });
         if (existing) {
-            return res.status(409).json({ message: "User already exists with the email" });
+            // If the user already exists but hasn't verified their email, regenerate
+            // the verification token and resend the email instead of returning an error.
+            if (!existing.emailVerified) {
+                const newVerificationToken = generateVerificationToken();
+                if (!newVerificationToken) {
+                    throw new Error('Failed to generate verification token');
+                }
+
+                await prisma.user.update({
+                    where: { email },
+                    data: { emailVerificationToken: newVerificationToken },
+                });
+
+                try {
+                    const emailResult = await sendVerificationEmail(email, existing.name || name, newVerificationToken);
+                    if ('fallback' in emailResult && emailResult.fallback) {
+                        console.warn('Email service unavailable, using fallback method');
+                        console.log(`Verification URL for ${email}: ${emailResult.verificationUrl}`);
+                    } else {
+                        console.log('Verification email resent successfully:', emailResult.messageId);
+                    }
+                } catch (error) {
+                    console.error('Error resending verification email:', error);
+                }
+
+                return res.status(200).json({
+                    message: "A new verification email has been sent. Please check your inbox to verify your account.",
+                    user: {
+                        id: existing.id,
+                        email: existing.email,
+                        name: existing.name,
+                        emailVerified: existing.emailVerified,
+                    }
+                });
+            }
+
+            // User is already verified — let them know without leaking details
+            return res.status(409).json({ message: "An account with this email already exists. Please log in." });
         }
         
         const hashedPassword = await hashPassword(password);
@@ -33,7 +70,7 @@ router.post("/register", async (req, res) => {
             data: { 
                 email, 
                 hashedPassword, 
-                name, 
+                name: name?.trim() || null,
                 emailVerificationToken: verificationToken 
             },
         });
@@ -83,6 +120,11 @@ router.post("/login", async (req, res) => {
             return res.status(401).json({ message: "Invalid email or password" });
         }
 
+        // Guard: user may have registered via OAuth and has no password set
+        if (!user.hashedPassword) {
+            return res.status(401).json({ message: "Invalid email or password" });
+        }
+
         const isPasswordValid = await verifyPassword(user.hashedPassword, password);
         if (!isPasswordValid) {
             return res.status(401).json({ message: "Invalid email or password" });
@@ -100,11 +142,12 @@ router.post("/login", async (req, res) => {
         const refreshToken = crypto.randomBytes(40).toString('hex');
         const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
 
+        const refreshExpDays = parseInt(process.env.REFRESH_TOKEN_EXP_DAYS || '30');
         await prisma.refreshToken.create({
             data: {
                 tokenHash,
                 userId: user.id,
-                expiresAt: new Date(Date.now() + (parseInt(process.env.REFRESH_TOKEN_EXP_DAYS || '7') * 24 * 60 * 60 * 1000)),
+                expiresAt: new Date(Date.now() + (refreshExpDays * 24 * 60 * 60 * 1000)),
                 ip: (req.ip || undefined),
                 userAgent: (req.headers['user-agent'] || undefined) as string | undefined,
             }
@@ -114,17 +157,15 @@ router.post("/login", async (req, res) => {
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: 15 * 60 * 1000, // 15 minutes
-            domain: process.env.COOKIE_DOMAIN || 'localhost',
         });
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: parseInt(process.env.REFRESH_TOKEN_EXP_DAYS || '30') * 24 * 60 * 60 * 1000,
-            domain: process.env.COOKIE_DOMAIN || 'localhost',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            maxAge: refreshExpDays * 24 * 60 * 60 * 1000,
         });
 
         // Update last login
@@ -178,8 +219,7 @@ router.post('/refresh', async (req, res) => {
             res.clearCookie('refreshToken', {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                domain: process.env.COOKIE_DOMAIN || 'localhost',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             });
             return res.status(401).json({ message: 'Refresh token expired' });
         }
@@ -210,17 +250,15 @@ router.post('/refresh', async (req, res) => {
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: 15 * 60 * 1000, // 15 minutes
-            domain: process.env.COOKIE_DOMAIN || 'localhost',
         });
 
         res.cookie('refreshToken', newRefreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: expDays * 24 * 60 * 60 * 1000,
-            domain: process.env.COOKIE_DOMAIN || 'localhost',
         });
 
         return res.status(200).json({ accessToken });
@@ -254,6 +292,18 @@ router.get('/verify', async (req, res) => {
             return res.status(400).json({ 
                 message: 'Invalid or expired verification token',
                 success: false 
+            });
+        }
+
+        // Enforce 24-hour token expiry (token was set at user creation / resend time)
+        // We compare against the user's updatedAt timestamp as the token issue time.
+        const TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+        const tokenIssuedAt = user.updatedAt.getTime();
+        if (Date.now() - tokenIssuedAt > TOKEN_EXPIRY_MS) {
+            return res.status(400).json({
+                message: 'Verification token has expired. Please request a new one.',
+                success: false,
+                tokenExpired: true,
             });
         }
 
@@ -315,15 +365,13 @@ router.post('/logout', async (req, res) => {
         res.clearCookie('accessToken', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            domain: process.env.COOKIE_DOMAIN || 'localhost',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         });
         
         res.clearCookie('refreshToken', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            domain: process.env.COOKIE_DOMAIN || 'localhost',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         });
         
         return res.status(200).json({ message: 'Logged out successfully' });

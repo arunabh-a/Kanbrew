@@ -1,44 +1,54 @@
-import { useState, useEffect } from "react";
+'use client'
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { apiRoutes, isAuthenticated } from "@/service/app.api";
-import { clearAuthData, setGlobalLogoutFunction } from "@/lib/interceptor";
-import { User } from "@/service/app.interface";
+import { apiRoutes } from "@/service/app.api";
+import { useUserStore } from "@/store/useUserStore";
+import { PUBLIC_ROUTES } from "@/lib/constants";
+import { usePathname } from "next/navigation";
 
 export function useAuth() {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const pathname = usePathname();
+    const { user, loading, hydrated, setUser, clearUser, setLoading, setHydrated } =
+        useUserStore();
+
+    const globalLogout = () => {
+        clearUser();
+        router.push("/home");
+    };
 
     useEffect(() => {
-        // Set up global logout function
-        setGlobalLogoutFunction(() => {
-            setUser(null);
-            router.push("/home");
-        });
-
-        // Load user profile if authenticated
-        if (isAuthenticated()) {
-            loadUser();
-        } else {
+        // Only fetch once — subsequent mounts read from the store directly.
+        if (hydrated) {
             setLoading(false);
+            return;
         }
-    }, [router]);
+        loadUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hydrated]);
 
     const loadUser = async () => {
+        setLoading(true);
         try {
+            // if (PUBLIC_ROUTES.includes(pathname)) {
+            //     return;
+            // } else {
+
+            // }
             const userData = await apiRoutes.user.getProfile();
             setUser(userData);
         } catch (error) {
             console.error("Failed to load user:", error);
-            setUser(null);
+            clearUser();
         } finally {
             setLoading(false);
+            setHydrated(true);
         }
     };
 
-    const register = async (email: string, password: string, name?: string) => {
+    const register = async (name: string, email: string, password: string) => {
         try {
-            await apiRoutes.auth.register({ email, password, name });
+            await apiRoutes.auth.register({ name, email, password });
             return {
                 success: true,
                 message:
@@ -53,6 +63,7 @@ export function useAuth() {
         try {
             const response = await apiRoutes.auth.login({ email, password });
             setUser(response.user);
+            setHydrated(true);
             router.push("/");
             return { success: true };
         } catch (error: any) {
@@ -63,20 +74,17 @@ export function useAuth() {
     const logout = async () => {
         try {
             await apiRoutes.auth.logout();
+            await fetch('/api')
         } catch (error) {
             console.error("Logout error:", error);
         } finally {
-            setUser(null);
-            clearAuthData();
+            clearUser();
+            setHydrated(false);
             router.push("/home");
         }
     };
 
-    const updateProfile = async (data: {
-        name?: string;
-        bio?: string;
-        avatarUrl?: string;
-    }) => {
+    const updateProfile = async (data: { name?: string; bio?: string }) => {
         try {
             const updatedUser = await apiRoutes.user.updateProfile(data);
             setUser(updatedUser);
@@ -86,30 +94,16 @@ export function useAuth() {
         }
     };
 
-    const changePassword = async (
-        currentPassword: string,
-        newPassword: string
-    ) => {
-        try {
-            await apiRoutes.user.changePassword({
-                currentPassword,
-                newPassword,
-            });
-            return { success: true, message: "Password changed successfully" };
-        } catch (error: any) {
-            return { success: false, message: error.message };
-        }
-    };
-
     return {
         user,
         loading,
+        hydrated,
+        globalLogout,
         isAuthenticated: !!user,
         register,
         login,
         logout,
         updateProfile,
-        changePassword,
         refreshUser: loadUser,
     };
 }

@@ -1,5 +1,5 @@
 import { LayoutGrid, List, Plus, Search } from "lucide-react";
-import { Status } from "@/service/app.interface";
+import { TaskStatus } from "@/service/app.interface";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,8 +16,8 @@ interface TaskToolbarProps {
     onViewChange: (view: "list" | "kanban") => void;
     searchQuery: string;
     onSearchChange: (query: string) => void;
-    statusFilter: Status | "all";
-    onStatusFilterChange: (status: Status | "all") => void;
+    statusFilter: TaskStatus | "ALL";
+    onStatusFilterChange: (status: TaskStatus | "ALL") => void;
     onCreateTask: () => void;
 }
 
@@ -51,10 +51,10 @@ export function TaskToolbar({
                         <SelectValue placeholder="Filter" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="todo">To Do</SelectItem>
-                        <SelectItem value="in-progress">In Progress</SelectItem>
-                        <SelectItem value="done">Done</SelectItem>
+                        <SelectItem value="ALL">All Status</SelectItem>
+                        <SelectItem value="TODO">To Do</SelectItem>
+                        <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                        <SelectItem value="DONE">Done</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

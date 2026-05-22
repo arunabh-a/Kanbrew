@@ -1,15 +1,15 @@
 {
-    "name": "taskbrew-server",
+    "name": "kanbrew-server",
     "version": "1.0.0",
-    "description": "Backend API for TaskBrew",
+    "description": "Backend API for Kanbrew",
     "type": "module",
-    "homepage": "https://github.com/arunabh-a/taskbrew#readme",
+    "homepage": "https://github.com/arunabh-a/Kanbrew#readme",
     "bugs": {
-        "url": "https://github.com/arunabh-a/Task-Brew/issues"
+        "url": "https://github.com/arunabh-a/Kanbrew/issues"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/arunabh-a/Task-Brew.git"
+        "url": "git+https://github.com/arunabh-a/Kanbrew.git"
     },
     "license": "ISC",
     "author": "arunabh",
@@ -18,14 +18,15 @@
         "dev": "tsx watch src/index.ts",
         "build": "tsc",
         "start": "node dist/index.js",
+        "postinstall": "prisma generate",
         "prisma": "prisma",
         "migrate:dev": "prisma migrate dev",
         "migrate:reset": "prisma migrate reset",
         "db:seed": "prisma db seed"
     },
     "dependencies": {
-        "@prisma/adapter-pg": "^7.1.0",
-        "@prisma/client": "^7.1.0",
+        "@prisma/adapter-pg": "^7.4.1",
+        "@prisma/client": "^7.4.1",
         "argon2": "^0.44.0",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
@@ -35,7 +36,7 @@
         "nodemailer": "^7.0.6",
         "nodemon": "^3.1.10",
         "pg": "^8.16.3",
-        "prisma": "^7.1.0"
+        "prisma": "^7.4.1"
     },
     "devDependencies": {
         "@types/cookie-parser": "^1.4.9",
