@@ -48,7 +48,7 @@ export default function Page() {
                 <div className="flex items-center gap-3">
                     <div className="flex text-sm items-center gap-2 p-1 border backdrop-blur-sm hover:bg-muted transition-colors rounded-xl">
                         <Link
-                            href="https://github.com/arunabh-a/Task-Brew"
+                            href="https://github.com/arunabh-a/Kanbrew"
                             target="_blank"
                             rel="noopener noreferrer"
                         >

@@ -56,7 +56,7 @@
 ## 📁 Project Structure
 
 ```
-Task-Brew/
+Kanbrew/
 ├── client/                 # Next.js frontend application
 │   ├── app/               # Next.js app directory
 │   │   ├── home/         # Home page (authenticated)
@@ -94,8 +94,8 @@ Task-Brew/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/arunabh-a/Task-Brew.git
-   cd Task-Brew
+   git clone https://github.com/arunabh-a/Kanbrew.git
+   cd Kanbrew
    ```
 
 2. **Set up the backend**
@@ -118,7 +118,7 @@ Task-Brew/
    EMAIL_PORT=587
    EMAIL_USER="your-email@example.com"
    EMAIL_PASSWORD="your-password"
-   EMAIL_FROM="Task-Brew <noreply@kanbrew.com>"
+   EMAIL_FROM="Kanbrew <noreply@kanbrew.com>"
    ```
 
 4. **Run database migrations**
@@ -330,13 +330,13 @@ sudo systemctl restart nginx
 
 ```ini
 [Unit]
-Description=Task-Brew Backend API
+Description=Kanbrew Backend API
 After=network.target postgresql.service
 
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu/Task-Brew/server
+WorkingDirectory=/home/ubuntu/Kanbrew/server
 Environment=NODE_ENV=production
 ExecStart=/usr/bin/node dist/index.js
 Restart=always
@@ -350,13 +350,13 @@ WantedBy=multi-user.target
 
 ```ini
 [Unit]
-Description=Task-Brew Frontend
+Description=Kanbrew Frontend
 After=network.target
 
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu/Task-Brew/client
+WorkingDirectory=/home/ubuntu/Kanbrew/client
 Environment=NODE_ENV=production
 ExecStart=/usr/bin/npm start
 Restart=always
@@ -379,8 +379,8 @@ sudo systemctl start kanbrew-frontend
 
 ```bash
 # Clone repository
-git clone https://github.com/arunabh-a/Task-Brew.git
-cd Task-Brew
+git clone https://github.com/arunabh-a/Kanbrew.git
+cd Kanbrew
 
 # Setup backend
 cd server
@@ -442,7 +442,7 @@ NEXT_PUBLIC_API_URL="https://your-domain.com/api"
 
 ## 🐛 Issues
 
-Found a bug? Please [open an issue](https://github.com/arunabh-a/Task-Brew/issues) on GitHub.
+Found a bug? Please [open an issue](https://github.com/arunabh-a/Kanbrew/issues) on GitHub.
 
 ---
 

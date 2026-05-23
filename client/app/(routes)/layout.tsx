@@ -6,9 +6,9 @@ import { useAuth } from "@/hooks/useAuth";
 
 
 // export const metadata: Metadata = {
-//     title: "Task Brew - Your Personal Task Manager",
+//     title: "Kanbrew - Your Personal Task Manager",
 //     description:
-//         "Task Brew helps you organize, prioritize, and track your tasks with ease.",
+//         "Kanbrew helps you organize, prioritize, and track your tasks with ease.",
 // };
 
 export default function PageLayout({

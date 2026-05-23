@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Task Brew - Your Personal Task Manager",
+    title: "Kanbrew - Your Personal Task Manager",
     description:
-        "Task Brew helps you organize, prioritize, and track your tasks with ease.",
+        "Kanbrew helps you organize, prioritize, and track your tasks with ease.",
 };
 
 export default function RootLayout({
@@ -28,7 +28,7 @@ export default function RootLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
             >
-                <main className="flex justify-center w-full">
+                <main className="flex dark justify-center w-full">
 
                 {children}
                 </main>
