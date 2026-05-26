@@ -18,13 +18,9 @@ export default function PageLayout({
 }>) {
     const { user, logout } = useAuth();
     return (
-            <body
-                className={'antialiased dark'}
-            >'
                 <main className="flex flex-col items-center justify-center w-full">
                     {user && <Header user={user} onLogout={logout} />}
                 {children}
                 </main>
-            </body>
     );
 }

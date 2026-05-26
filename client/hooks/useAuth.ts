@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { apiRoutes } from "@/service/app.api";
 import { useUserStore } from "@/store/useUserStore";
-import { PUBLIC_ROUTES } from "@/lib/constants";
 import { usePathname } from "next/navigation";
+import { isPublicPage } from "@/proxy";
 
 export function useAuth() {
     const router = useRouter();
@@ -30,11 +30,9 @@ export function useAuth() {
     const loadUser = async () => {
         setLoading(true);
         try {
-            // if (PUBLIC_ROUTES.includes(pathname)) {
-            //     return;
-            // } else {
-
-            // }
+            if (isPublicPage(pathname)) {
+                return;
+            }
             const userData = await apiRoutes.user.getProfile();
             setUser(userData);
         } catch (error) {

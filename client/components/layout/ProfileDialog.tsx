@@ -66,7 +66,7 @@ export function ProfileDialog({
                         </Label>
                         <Input
                             id="name"
-                            value={user.name}
+                            value={user.name || ' - '}
                             readOnly
                             className="bg-muted/50"
                         />

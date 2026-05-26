@@ -63,7 +63,7 @@ export const authFetch = async <T = unknown>(
                     });
                 } else {
                     handleAutoLogout("Refresh token expired");
-                    throw new Error("Authentication failed");
+                    // throw new Error("Authentication failed");
                 }
             } catch (error) {
                 handleAutoLogout("Token refresh failed");

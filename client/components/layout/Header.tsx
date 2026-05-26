@@ -85,11 +85,11 @@ export function Header({ user, onLogout }: HeaderProps) {
                             </p>
                         </div>
                     </div>
-                    <DropdownMenuSeparator />
+                    {/* <DropdownMenuSeparator />
                     <DropdownMenuItem>
                         <User className="mr-2 h-4 w-4" />
                         Profile
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                         onClick={onLogout}

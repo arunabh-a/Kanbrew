@@ -3,6 +3,7 @@ import { ArrowRight, CheckCircle2, LayoutGrid, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import kanbrew from "../../public/kanbrew.png";
+import github from "../../public/github.svg";
 
 const features = [
     {
@@ -53,7 +54,7 @@ export default function Page() {
                             rel="noopener noreferrer"
                         >
                             <Image
-                                src="/github.svg"
+                                src={github}
                                 alt="GitHub"
                                 width={24}
                                 height={24}
