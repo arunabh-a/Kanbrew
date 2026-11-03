@@ -1,6 +1,6 @@
 <div align="center">
-  <img alt="Kanbrew Logo" src="client/public/kanbrew.png" width="120" />
-  <h1>Kanbrew (previously TaskBrew)</h1>
+  <img alt="Yohaku Logo" src="client/public/yohaku.png" width="120" />
+  <h1>Yohaku</h1>
   <p>A modern, full-stack task management application with drag-and-drop Kanban boards,<br/>built with Next.js, Express, and Prisma.</p>
 </div>
 
@@ -56,7 +56,7 @@
 ## 📁 Project Structure
 
 ```
-Kanbrew/
+Yohaku/
 ├── client/                 # Next.js frontend application
 │   ├── app/               # Next.js app directory
 │   │   ├── home/         # Home page (authenticated)
@@ -94,8 +94,8 @@ Kanbrew/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/arunabh-a/Kanbrew.git
-   cd Kanbrew
+   git clone https://github.com/arunabh-a/Yohaku.git
+   cd Yohaku
    ```
 
 2. **Set up the backend**
@@ -108,7 +108,7 @@ Kanbrew/
    
    Create a `.env` file in the `server` directory:
    ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/kanbrew"
+   DATABASE_URL="postgresql://user:password@localhost:5432/yohaku"
    JWT_SECRET="your-jwt-secret"
    JWT_REFRESH_SECRET="your-refresh-secret"
    CORS_CLIENT_URL="http://localhost:3000"
@@ -118,7 +118,7 @@ Kanbrew/
    EMAIL_PORT=587
    EMAIL_USER="your-email@example.com"
    EMAIL_PASSWORD="your-password"
-   EMAIL_FROM="Kanbrew <noreply@kanbrew.com>"
+   EMAIL_FROM="Yohaku <noreply@yohaku.com>"
    ```
 
 4. **Run database migrations**
@@ -180,7 +180,7 @@ Kanbrew/
 - `DELETE /api/tasks/:id` - Delete a task
 
 For detailed API documentation, import the Postman collection available at:
-`server/kanbrew-API.postman_collection.json`
+`server/Yohaku-API.postman_collection.json`
 
 ## 🗄️ Database Schema
 
@@ -285,7 +285,7 @@ sudo npm install -g pm2
 
 #### 2. Configure Nginx Reverse Proxy
 
-Create Nginx configuration at `/etc/nginx/sites-available/kanbrew`:
+Create Nginx configuration at `/etc/nginx/sites-available/yohaku`:
 
 ```nginx
 server {
@@ -319,24 +319,24 @@ server {
 
 Enable the site:
 ```bash
-sudo ln -s /etc/nginx/sites-available/kanbrew /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/yohaku /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl restart nginx
 ```
 
 #### 3. Setup systemd Services
 
-**Backend Service** (`/etc/systemd/system/kanbrew-backend.service`):
+**Backend Service** (`/etc/systemd/system/yohaku-backend.service`):
 
 ```ini
 [Unit]
-Description=Kanbrew Backend API
+Description=Yohaku Backend API
 After=network.target postgresql.service
 
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu/Kanbrew/server
+WorkingDirectory=/home/ubuntu/Yohaku/server
 Environment=NODE_ENV=production
 ExecStart=/usr/bin/node dist/index.js
 Restart=always
@@ -346,17 +346,17 @@ RestartSec=10
 WantedBy=multi-user.target
 ```
 
-**Frontend Service** (`/etc/systemd/system/kanbrew-frontend.service`):
+**Frontend Service** (`/etc/systemd/system/yohaku-frontend.service`):
 
 ```ini
 [Unit]
-Description=Kanbrew Frontend
+Description=Yohaku Frontend
 After=network.target
 
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu/Kanbrew/client
+WorkingDirectory=/home/ubuntu/Yohaku/client
 Environment=NODE_ENV=production
 ExecStart=/usr/bin/npm start
 Restart=always
@@ -369,18 +369,18 @@ WantedBy=multi-user.target
 **Enable and start services:**
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable kanbrew-backend
-sudo systemctl enable kanbrew-frontend
-sudo systemctl start kanbrew-backend
-sudo systemctl start kanbrew-frontend
+sudo systemctl enable yohaku-backend
+sudo systemctl enable yohaku-frontend
+sudo systemctl start yohaku-backend
+sudo systemctl start yohaku-frontend
 ```
 
 #### 4. Deploy Application
 
 ```bash
 # Clone repository
-git clone https://github.com/arunabh-a/Kanbrew.git
-cd Kanbrew
+git clone https://github.com/arunabh-a/Yohaku.git
+cd Yohaku
 
 # Setup backend
 cd server
@@ -405,20 +405,20 @@ sudo certbot --nginx -d your-domain.com
 
 ```bash
 # Check service status
-sudo systemctl status kanbrew-backend
-sudo systemctl status kanbrew-frontend
+sudo systemctl status yohaku-backend
+sudo systemctl status yohaku-frontend
 
 # View logs
-sudo journalctl -u kanbrew-backend -f
-sudo journalctl -u kanbrew-frontend -f
+sudo journalctl -u yohaku-backend -f
+sudo journalctl -u yohaku-frontend -f
 
 # Restart services
-sudo systemctl restart kanbrew-backend
-sudo systemctl restart kanbrew-frontend
+sudo systemctl restart yohaku-backend
+sudo systemctl restart yohaku-frontend
 
 # Stop services
-sudo systemctl stop kanbrew-backend
-sudo systemctl stop kanbrew-frontend
+sudo systemctl stop yohaku-backend
+sudo systemctl stop yohaku-frontend
 ```
 
 ### Environment Variables (Production)
@@ -428,7 +428,7 @@ Ensure your production `.env` files are properly configured:
 **Server `.env`:**
 ```env
 NODE_ENV=production
-DATABASE_URL="postgresql://user:password@localhost:5432/kanbrew"
+DATABASE_URL="postgresql://user:password@localhost:5432/yohaku"
 JWT_SECRET="your-production-jwt-secret"
 JWT_REFRESH_SECRET="your-production-refresh-secret"
 CORS_CLIENT_URL="https://your-domain.com"
@@ -442,7 +442,7 @@ NEXT_PUBLIC_API_URL="https://your-domain.com/api"
 
 ## 🐛 Issues
 
-Found a bug? Please [open an issue](https://github.com/arunabh-a/Kanbrew/issues) on GitHub.
+Found a bug? Please [open an issue](https://github.com/arunabh-a/Yohaku/issues) on GitHub.
 
 ---
 

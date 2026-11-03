@@ -6,9 +6,9 @@ import { useAuth } from "@/hooks/useAuth";
 
 
 // export const metadata: Metadata = {
-//     title: "Kanbrew - Your Personal Task Manager",
+//     title: "Yohaku - Your Personal Task Manager",
 //     description:
-//         "Kanbrew helps you organize, prioritize, and track your tasks with ease.",
+//         "Yohaku helps you organize, prioritize, and track your tasks with ease.",
 // };
 
 export default function PageLayout({

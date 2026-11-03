@@ -39,7 +39,7 @@ export function TaskToolbar({
                         placeholder="Search tasks..."
                         value={searchQuery}
                         onChange={(e) => onSearchChange(e.target.value)}
-                        className="pl-9"
+                        className="pl-9 bg-card border-border"
                     />
                 </div>
 
@@ -47,7 +47,7 @@ export function TaskToolbar({
                     value={statusFilter}
                     onValueChange={onStatusFilterChange}
                 >
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="w-[140px] bg-card border-border">
                         <SelectValue placeholder="Filter" />
                     </SelectTrigger>
                     <SelectContent>
@@ -60,14 +60,14 @@ export function TaskToolbar({
             </div>
 
             <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                <div className="flex items-center bg-secondary rounded-lg p-1">
+                <div className="flex items-center bg-secondary border border-border rounded-lg p-1">
                     <button
                         aria-label="List View"
                         onClick={() => onViewChange("list")}
                         className={cn(
                             "flex items-center justify-center p-2 rounded-md transition-colors",
                             view === "list"
-                                ? "bg-background text-foreground shadow-sm"
+                                ? "bg-slate text-ivory shadow-xs"
                                 : "text-muted-foreground hover:text-foreground"
                         )}
                     >
@@ -79,7 +79,7 @@ export function TaskToolbar({
                         className={cn(
                             "flex items-center justify-center p-2 rounded-md transition-colors",
                             view === "kanban"
-                                ? "bg-background text-foreground shadow-sm"
+                                ? "bg-slate text-ivory shadow-xs"
                                 : "text-muted-foreground hover:text-foreground"
                         )}
                     >

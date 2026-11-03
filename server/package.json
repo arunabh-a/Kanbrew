@@ -1,15 +1,15 @@
 {
-    "name": "kanbrew-server",
+    "name": "yohaku-server",
     "version": "1.0.0",
-    "description": "Backend API for Kanbrew",
+    "description": "Backend API for Yohaku",
     "type": "module",
-    "homepage": "https://github.com/arunabh-a/Kanbrew#readme",
+    "homepage": "https://github.com/arunabh-a/Yohaku#readme",
     "bugs": {
-        "url": "https://github.com/arunabh-a/Kanbrew/issues"
+        "url": "https://github.com/arunabh-a/Yohaku/issues"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/arunabh-a/Kanbrew.git"
+        "url": "git+https://github.com/arunabh-a/Yohaku.git"
     },
     "license": "ISC",
     "author": "arunabh",

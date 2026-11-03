@@ -28,25 +28,30 @@ const VerifyToken = () => {
     }, [token]);
 
     return (
-        <div className="flex items-center justify-center h-screen">
-            {error ? (
-                <div>
-                    <p>{error}</p>
-                    <button onClick={() => router.push("/home")}>
-                        Go back
-                    </button>
-                </div>
-            ) : isVerified === false ? (
-                <div>
-                    <p>Verifying...</p>
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                </div>
-            ) : (
-                <div>
-                    <p>Verified, Redirecting to login....</p>
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                </div>
-            )}
+        <div className="flex items-center justify-center min-h-screen w-full bg-background text-foreground p-4">
+            <div className="w-full max-w-sm p-8 rounded-2xl bg-card border border-border shadow-sm text-center">
+                {error ? (
+                    <div className="space-y-4">
+                        <p className="text-sm font-medium text-destructive">{error}</p>
+                        <button
+                            onClick={() => router.push("/home")}
+                            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                        >
+                            Go back
+                        </button>
+                    </div>
+                ) : isVerified === false ? (
+                    <div className="space-y-4">
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-slate mx-auto" />
+                        <p className="text-sm font-medium text-ink">Verifying your email...</p>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-moss mx-auto" />
+                        <p className="text-sm font-medium text-moss">Verified! Redirecting to login...</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

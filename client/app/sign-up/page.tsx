@@ -32,7 +32,7 @@ export default function Signup() {
     return (
         <AuthLayout
             title="Create an account"
-            subtitle="Get started with Kanbrew today"
+            subtitle="Get started with Yohaku today"
         >
             <SignupForm
                 onSubmit={handleSignup}

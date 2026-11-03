@@ -55,7 +55,7 @@ const buildVerificationEmail = (
       <!-- Header -->
       <div style="text-align: center; padding-bottom: 32px;">
         <h1 style="color: #3b82f6; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin: 0;">
-          Kanbrew
+          Yohaku
         </h1>
       </div>
 
@@ -100,7 +100,7 @@ const buildVerificationEmail = (
       <!-- Footer -->
       <div style="text-align: center; padding-top: 24px;">
         <p style="color: #2e3b50; font-size: 12px; margin: 0;">
-          &copy; ${new Date().getFullYear()} Kanbrew
+          &copy; ${new Date().getFullYear()} Yohaku
         </p>
       </div>
 
@@ -138,9 +138,9 @@ export const sendVerificationEmail = async (
             }
 
             const result = await transporter.sendMail({
-                from: `"Kanbrew" <${process.env.EMAIL_USER}>`,
+                from: `"Yohaku" <${process.env.EMAIL_USER}>`,
                 to: email,
-                subject: "Kanbrew – Verify your email address",
+                subject: "Yohaku – Verify your email address",
                 html: buildVerificationEmail(name, verificationUrl),
             });
 

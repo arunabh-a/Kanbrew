@@ -95,12 +95,12 @@ export default function ProjectsPage() {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen bg-background flex flex-col items-center">
+        <div className="min-h-screen w-full bg-background flex flex-col items-center">
 
             <main className="container px-4 md:px-6 py-8 w-full">
                 <div className="mb-8 flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold mb-1">Projects</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold text-ink mb-1">Projects</h1>
                         <p className="text-muted-foreground">Manage your teams and projects</p>
                     </div>
                     <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
@@ -115,10 +115,10 @@ export default function ProjectsPage() {
                     </div>
                 ) : projects.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
-                            <FolderKanban className="w-8 h-8 text-muted-foreground" />
+                        <div className="w-16 h-16 rounded-2xl bg-slate/15 flex items-center justify-center mb-4">
+                            <FolderKanban className="w-8 h-8 text-slate" />
                         </div>
-                        <h3 className="text-lg font-semibold mb-2">No projects yet</h3>
+                        <h3 className="text-lg font-semibold text-ink mb-2">No projects yet</h3>
                         <p className="text-muted-foreground mb-6 max-w-sm">
                             Create a project to start collaborating with your team on tasks.
                         </p>
@@ -136,11 +136,11 @@ export default function ProjectsPage() {
                                 <Link
                                     key={project.id}
                                     href={`/projects/${project.id}`}
-                                    className="group relative block p-6 rounded-2xl bg-card border border-border hover:border-primary/40 hover:shadow-md transition-all duration-200"
+                                    className="group relative block p-6 rounded-2xl bg-card border border-border hover:border-ochre/50 hover:shadow-md transition-all duration-200"
                                 >
                                     <div className="flex items-start justify-between mb-4">
-                                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                                            <FolderKanban className="w-5 h-5 text-primary" />
+                                        <div className="w-10 h-10 rounded-xl bg-slate/15 flex items-center justify-center">
+                                            <FolderKanban className="w-5 h-5 text-slate" />
                                         </div>
                                         {isAdmin && (
                                             <button
@@ -153,7 +153,7 @@ export default function ProjectsPage() {
                                         )}
                                     </div>
 
-                                    <h3 className="font-semibold text-base mb-1 truncate">{project.name}</h3>
+                                    <h3 className="font-semibold text-base text-ink mb-1 truncate">{project.name}</h3>
                                     {project.description && (
                                         <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                                             {project.description}
@@ -162,15 +162,15 @@ export default function ProjectsPage() {
 
                                     <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border text-sm text-muted-foreground">
                                         <span className="flex items-center gap-1.5">
-                                            <Users className="w-3.5 h-3.5" />
+                                            <Users className="w-3.5 h-3.5 text-slate" />
                                             {project.members.length} {project.members.length === 1 ? "member" : "members"}
                                         </span>
                                         <span className="flex items-center gap-1.5">
-                                            <CheckSquare className="w-3.5 h-3.5" />
+                                            <CheckSquare className="w-3.5 h-3.5 text-moss" />
                                             {project._count?.tasks ?? 0} tasks
                                         </span>
                                         {isAdmin && (
-                                            <span className="ml-auto px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                                            <span className="ml-auto px-2.5 py-0.5 rounded-full bg-ochre/20 border border-ochre/30 text-ink text-xs font-medium">
                                                 Admin
                                             </span>
                                         )}

@@ -17,8 +17,14 @@ interface KanbanColumnProps {
 
 const statusColors: Record<Status, string> = {
   TODO: "bg-status-todo",
-  IN_PROGRESS: "bg-status-progress",
-  DONE: "bg-status-done",
+  IN_PROGRESS: "bg-slate",
+  DONE: "bg-moss",
+};
+
+const statusBadgeStyles: Record<Status, string> = {
+  TODO: "bg-secondary text-muted-foreground border-border",
+  IN_PROGRESS: "bg-slate/15 text-slate border-slate/30",
+  DONE: "bg-moss/15 text-moss border-moss/30",
 };
 
 export function KanbanColumn({
@@ -34,19 +40,24 @@ export function KanbanColumn({
   });
 
   return (
-    <div className="flex-1 min-w-[280px] max-w-[350px]">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className={cn("w-2 h-2 rounded-full", statusColors[status])} />
-          <h3 className="font-medium text-sm">{title}</h3>
-          <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
+    <div className="flex-1 min-w-[280px] max-w-[360px]">
+      <div className="flex items-center justify-between mb-3 px-1">
+        <div className="flex items-center gap-2.5">
+          <div className={cn("w-2.5 h-2.5 rounded-full", statusColors[status])} />
+          <h3 className="font-semibold text-sm text-ink">{title}</h3>
+          <span
+            className={cn(
+              "text-xs font-medium px-2 py-0.5 rounded-full border",
+              statusBadgeStyles[status]
+            )}
+          >
             {tasks.length}
           </span>
         </div>
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7"
+          className="h-7 w-7 text-muted-foreground hover:text-ink"
           onClick={() => onAddTask(status)}
         >
           <Plus className="w-4 h-4" />
@@ -56,8 +67,8 @@ export function KanbanColumn({
       <div
         ref={setNodeRef}
         className={cn(
-          "space-y-3 min-h-[200px] p-2 -m-2 rounded-xl transition-colors duration-200",
-          isOver && "bg-secondary/50"
+          "space-y-3 min-h-[240px] p-3 rounded-2xl bg-secondary/45 border border-border/70 transition-colors duration-200",
+          isOver && "bg-slate/10 border-slate/40"
         )}
       >
         <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
@@ -75,7 +86,7 @@ export function KanbanColumn({
           <div
             className={cn(
               "flex items-center justify-center h-32 border-2 border-dashed border-border rounded-xl text-muted-foreground text-sm transition-colors",
-              isOver && "border-primary bg-primary/5"
+              isOver && "border-slate bg-slate/10 text-slate"
             )}
           >
             Drop tasks here

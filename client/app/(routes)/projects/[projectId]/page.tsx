@@ -42,14 +42,14 @@ const STATUS_ICONS: Record<string, React.ElementType> = {
     TODO: Circle,
 };
 const STATUS_COLORS: Record<string, string> = {
-    DONE: "text-green-500",
-    IN_PROGRESS: "text-amber-500",
+    DONE: "text-moss",
+    IN_PROGRESS: "text-slate",
     TODO: "text-muted-foreground",
 };
 const PRIORITY_COLORS: Record<string, string> = {
-    HIGH: "bg-red-500/15 text-red-500",
-    MEDIUM: "bg-amber-500/15 text-amber-500",
-    LOW: "bg-muted text-muted-foreground",
+    HIGH: "bg-priority-high/15 text-priority-high border border-priority-high/30",
+    MEDIUM: "bg-ochre/15 text-ochre border border-ochre/30",
+    LOW: "bg-moss/15 text-moss border border-moss/30",
 };
 
 export default function ProjectDetailPage() {
@@ -178,14 +178,13 @@ export default function ProjectDetailPage() {
     if (!user || !project) return null;
 
     return (
-        <div className="min-h-screen bg-background flex flex-col items-center">
-            <Header user={user} onLogout={logout} />
+        <div className="min-h-screen w-full bg-background flex flex-col items-center">
 
             <main className="container px-4 md:px-6 py-8 w-full">
                 {/* Breadcrumb */}
                 <Link
                     href="/projects"
-                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-ink mb-6 transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     All projects
@@ -194,7 +193,7 @@ export default function ProjectDetailPage() {
                 {/* Header */}
                 <div className="flex items-start justify-between mb-8">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold mb-1">{project.name}</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold text-ink mb-1">{project.name}</h1>
                         {project.description && (
                             <p className="text-muted-foreground">{project.description}</p>
                         )}
@@ -210,7 +209,7 @@ export default function ProjectDetailPage() {
                     {/* Tasks column */}
                     <div className="lg:col-span-2 space-y-3">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold">Tasks ({tasks.length})</h2>
+                            <h2 className="text-lg font-semibold text-ink">Tasks ({tasks.length})</h2>
                             <Button
                                 size="sm"
                                 variant="outline"
@@ -222,7 +221,7 @@ export default function ProjectDetailPage() {
                         </div>
 
                         {tasks.length === 0 ? (
-                            <div className="rounded-2xl border border-dashed border-border p-10 text-center">
+                            <div className="rounded-2xl border border-dashed border-border bg-secondary/30 p-10 text-center">
                                 <p className="text-muted-foreground text-sm">No tasks yet in this project.</p>
                                 <Button size="sm" className="mt-4" onClick={() => setIsCreateTaskOpen(true)}>
                                     Create first task
@@ -234,13 +233,13 @@ export default function ProjectDetailPage() {
                                 return (
                                     <div
                                         key={task.id}
-                                        className="flex items-start gap-3 p-4 rounded-xl bg-card border border-border hover:border-muted-foreground/30 transition-colors"
+                                        className="flex items-start gap-3 p-4 rounded-xl bg-card border border-border hover:border-ochre/50 transition-colors"
                                     >
                                         <StatusIcon
                                             className={`w-4 h-4 mt-0.5 flex-shrink-0 ${STATUS_COLORS[task.status]}`}
                                         />
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-sm truncate">{task.title}</p>
+                                            <p className="font-medium text-sm text-ink truncate">{task.title}</p>
                                             {task.description && (
                                                 <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
                                                     {task.description}
@@ -273,8 +272,8 @@ export default function ProjectDetailPage() {
                     {/* Members sidebar */}
                     <div>
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold flex items-center gap-2">
-                                <Users className="w-4 h-4" />
+                            <h2 className="text-lg font-semibold text-ink flex items-center gap-2">
+                                <Users className="w-4 h-4 text-slate" />
                                 Team ({project.members.length})
                             </h2>
                             {isAdmin && (
@@ -296,11 +295,11 @@ export default function ProjectDetailPage() {
                                     key={member.userId}
                                     className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border"
                                 >
-                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                        <User className="w-4 h-4 text-primary" />
+                                    <div className="w-8 h-8 rounded-full bg-slate/15 flex items-center justify-center flex-shrink-0">
+                                        <User className="w-4 h-4 text-slate" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium truncate">
+                                        <p className="text-sm font-medium text-ink truncate">
                                             {member.user.name || member.user.email}
                                         </p>
                                         <p className="text-xs text-muted-foreground truncate">
@@ -309,8 +308,8 @@ export default function ProjectDetailPage() {
                                     </div>
                                     <div className="flex items-center gap-1.5 flex-shrink-0">
                                         {member.role === "ADMIN" ? (
-                                            <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-                                                <Crown className="w-3 h-3" />
+                                            <span className="flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-ochre/20 border border-ochre/30 text-ink font-medium">
+                                                <Crown className="w-3 h-3 text-ochre" />
                                                 Admin
                                             </span>
                                         ) : isAdmin ? (

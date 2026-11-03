@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { TaskStatus, DashboardSummary } from "@/service/app.interface";
 import { useTasks } from "@/hooks/useTasks";
 import { useAuth } from "@/hooks/useAuth";
-import { Header } from "@/components/layout/Header";
 import { TaskToolbar } from "@/components/layout/Toolbar";
 import { TaskListView } from "@/components/tasks/TaskList";
 import { KanbanBoard } from "@/components/tasks/KanbanBoard";
@@ -14,8 +13,7 @@ import { CheckSquare, Clock, AlertCircle, Circle } from "lucide-react";
 
 export default function Dashboard() {
     const router = useRouter();
-    const { loading: authLoading, logout } = useAuth();
-    const { user } = useAuth();
+    const { loading: authLoading, logout, user } = useAuth();
 
     const {
         tasks,
@@ -83,38 +81,42 @@ export default function Dashboard() {
             label: "To Do",
             value: summary?.summary.TODO ?? "—",
             icon: Circle,
-            color: "text-muted-foreground",
-            bg: "bg-muted/40",
+            color: "text-ink/70",
+            bg: "bg-secondary",
+            border: "border-border",
         },
         {
             label: "In Progress",
             value: summary?.summary.IN_PROGRESS ?? "—",
             icon: Clock,
-            color: "text-amber-500",
-            bg: "bg-amber-500/10",
+            color: "text-slate",
+            bg: "bg-slate/15",
+            border: "border-slate/25",
         },
         {
             label: "Done",
             value: summary?.summary.DONE ?? "—",
             icon: CheckSquare,
-            color: "text-green-500",
-            bg: "bg-green-500/10",
+            color: "text-moss",
+            bg: "bg-moss/15",
+            border: "border-moss/25",
         },
         {
             label: "Overdue",
             value: summary?.overdue ?? "—",
             icon: AlertCircle,
-            color: "text-red-500",
-            bg: "bg-red-500/10",
+            color: "text-ochre",
+            bg: "bg-ochre/15",
+            border: "border-ochre/30",
         },
     ];
 
     return (
-        <div className="min-h-screen w-full bg-backgrond flex flex-col items-center">
+        <div className="min-h-screen w-full bg-background flex flex-col items-center">
 
             <main className="container px-4 md:px-6 py-8">
                 <div className="mb-8">
-                    <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                    <h1 className="text-2xl md:text-3xl font-bold text-ink mb-2">
                         My Tasks
                     </h1>
                     <p className="text-muted-foreground">
@@ -127,13 +129,13 @@ export default function Dashboard() {
                     {statCards.map((stat) => (
                         <div
                             key={stat.label}
-                            className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border"
+                            className={`flex items-center gap-3 p-4 rounded-xl bg-card border ${stat.border} shadow-xs`}
                         >
                             <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center shrink-0`}>
                                 <stat.icon className={`w-4 h-4 ${stat.color}`} />
                             </div>
                             <div>
-                                <p className="text-xl font-bold leading-none">{stat.value}</p>
+                                <p className="text-xl font-bold text-ink leading-none">{stat.value}</p>
                                 <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
                             </div>
                         </div>
