@@ -65,13 +65,13 @@ export default function Page() {
 
             {/* Hero */}
             <main className="relative z-10 w-full px-4 md:px-6">
-                <div className="flex flex-col items-center text-center pt-20 md:pt-32 pb-20">
+                <div className="flex flex-col font-display items-center text-center pt-20 md:pt-32 pb-20">
                     <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-ochre/15 border border-ochre/30 text-sm font-medium text-ink mb-6 animate-fade-up">
                         <span className="w-2 h-2 rounded-full bg-ochre animate-pulse" />
                         Now with Kanban boards
                     </div>
 
-                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-ink mb-6 animate-fade-up max-w-4xl">
+                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold  tracking-tight text-ink mb-6 animate-fade-up max-w-4xl">
                         Organize your work,
                         <br />
                         <span className="text-gradient">
@@ -88,7 +88,7 @@ export default function Page() {
                     </p>
 
                     <div
-                        className="flex flex-col sm:flex-row items-center gap-4 animate-fade-up"
+                        className="flex flex-col font-bold sm:flex-row items-center gap-4 animate-fade-up"
                         style={{ animationDelay: "200ms" }}
                     >
                         <Button
@@ -112,7 +112,7 @@ export default function Page() {
                     {features.map((feature, index) => (
                         <div
                             key={feature.title}
-                            className="p-6 rounded-2xl bg-card border border-border hover:border-ochre/50 hover:shadow-md transition-all duration-200 animate-fade-up"
+                            className="p-6 rounded-2xl bg-card font-display border border-border hover:border-ochre/50 hover:shadow-md transition-all duration-200 animate-fade-up"
                             style={{ animationDelay: `${300 + index * 100}ms` }}
                         >
                             <div className={`w-10 h-10 rounded-xl ${feature.iconBg} flex items-center justify-center mb-4`}>

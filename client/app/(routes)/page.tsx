@@ -48,10 +48,6 @@ export default function Dashboard() {
         }
     }, [user]);
 
-    const handleLogout = async () => {
-        await logout();
-    };
-
     const handleCreateTask = (status?: TaskStatus) => {
         if (status) {
             setDefaultStatus(status);
@@ -112,61 +108,35 @@ export default function Dashboard() {
     ];
 
     return (
-        <div className="min-h-screen w-full bg-background flex flex-col items-center">
+        <div className="flex flex-col h-full min-h-screen w-full bg-background">
+            <TaskToolbar
+                view={view}
+                onViewChange={setView}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                statusFilter={statusFilter}
+                onStatusFilterChange={setStatusFilter}
+                onCreateTask={() => handleCreateTask()}
+            />
 
-            <main className="container px-4 md:px-6 py-8">
-                <div className="mb-8">
-                    <h1 className="text-2xl md:text-3xl font-bold text-ink mb-2">
-                        My Tasks
-                    </h1>
-                    <p className="text-muted-foreground">
-                        Manage and organize your work efficiently
-                    </p>
-                </div>
-
-                {/* Dashboard Stats */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                    {statCards.map((stat) => (
-                        <div
-                            key={stat.label}
-                            className={`flex items-center gap-3 p-4 rounded-xl bg-card border ${stat.border} shadow-xs`}
-                        >
-                            <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center shrink-0`}>
-                                <stat.icon className={`w-4 h-4 ${stat.color}`} />
-                            </div>
-                            <div>
-                                <p className="text-xl font-bold text-ink leading-none">{stat.value}</p>
-                                <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                <TaskToolbar
-                    view={view}
-                    onViewChange={setView}
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                    statusFilter={statusFilter}
-                    onStatusFilterChange={setStatusFilter}
-                    onCreateTask={() => handleCreateTask()}
-                />
-
+            <main className="flex-1 min-w-0 p-4">
                 {tasksLoading ? (
                     <div className="flex items-center justify-center py-12">
                         <div className="text-center">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                            <p className="text-muted-foreground">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+                            <p className="text-sm text-muted-foreground">
                                 Loading tasks...
                             </p>
                         </div>
                     </div>
                 ) : view === "list" ? (
-                    <TaskListView
-                        tasks={tasks}
-                        onUpdate={updateTask}
-                        onDelete={deleteTask}
-                    />
+                    <div className="max-w-2xl">
+                        <TaskListView
+                            tasks={tasks}
+                            onUpdate={updateTask}
+                            onDelete={deleteTask}
+                        />
+                    </div>
                 ) : (
                     <KanbanBoard
                         tasks={tasks}

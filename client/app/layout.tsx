@@ -1,15 +1,40 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Manrope, IBM_Plex_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const geistSans = Geist({
-    variable: "--font-geist-sans",
+
+const manrope = Manrope({
+    variable: "--font-manrope",
     subsets: ["latin"],
+})
+
+const ibmMono = IBM_Plex_Mono({
+    variable: "--font-ibm-mono",
+    subsets: ["latin"],
+    weight: ["400", "500", "600"],
 });
 
-const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
-    subsets: ["latin"],
+const petrona = localFont({
+    src: [
+        {
+            path: "../public/fonts/Petrona-Regular.woff2",
+            weight: "500",
+        },
+        {
+            path: "../public/fonts/Petrona-Medium.woff2",
+            weight: "600",
+        },
+        {
+            path: "../public/fonts/Petrona-Semibold.woff2",
+            weight: "700",
+        },
+        {
+            path: "../public/fonts/Petrona-Bold.woff2",
+            weight: "800",
+        },
+    ],
+    variable: "--font-petrona",
 });
 
 export const metadata: Metadata = {
@@ -26,7 +51,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+                className={`${manrope.variable} ${ibmMono.variable} ${petrona.variable} font-sans antialiased bg-background text-foreground`}
             >
                 <main className="flex justify-center w-full">
 

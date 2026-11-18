@@ -26,7 +26,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
                 <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20 text-ivory">
-                    <div className="mb-8">
+                    <div className="mb-8 font-display">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-2 rounded-xl bg-ivory/10 border border-ivory/15 flex items-center justify-center">
                                 <Image
@@ -51,14 +51,14 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
                         </p>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-3 ">
                         {features.map((feature) => (
                             <div
                                 key={feature}
                                 className="flex items-center gap-3"
                             >
                                 <CheckCircle2 className="w-5 h-5 text-moss" />
-                                <span className="text-ivory/85">
+                                <span className="text-ivory/85 font-display">
                                     {feature}
                                 </span>
                             </div>
